@@ -2,9 +2,11 @@ import cv2
 import moviepy.editor as mp
 
 # 加载视频文件 cv2.resize()
-fileName = "HarryPotter"
+fileName = "Low"
+folder_path = "D:/Python/研究所/source video/"
 #video = cv2.VideoCapture(f"C:/Python/Video_Python/{fileName}.mp4")
-video = cv2.VideoCapture(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/{fileName}.mp4")
+video = cv2.VideoCapture(f"{folder_path}{fileName}.mp4")
+
 
 # 检查视频是否成功打开
 if not video.isOpened():
@@ -24,7 +26,7 @@ new_height = 2880 #4320
 
 # 创建一个VideoWriter对象，用于保存处理后的视频
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 转换为MP4格式
-out = cv2.VideoWriter(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/output.mp4", fourcc, fps, (new_width, new_height))
+out = cv2.VideoWriter(f"{folder_path}output.mp4", fourcc, fps, (new_width, new_height))
 
 
 # 设置调整参数
@@ -82,18 +84,18 @@ out.release()
 
 #===================加載聲音=======================
 # 加载原始视频文件
-video_with_audio = mp.VideoFileClip(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/{fileName}.mp4")
+video_with_audio = mp.VideoFileClip(f"{folder_path}{fileName}.mp4")
 
-video = cv2.VideoCapture(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/{fileName}.mp4")
+video = cv2.VideoCapture(f"{folder_path}{fileName}.mp4")
 
 # 读取原始视频中的音频
 audio = video_with_audio.audio
 
 # 创建一个新的视频文件，将处理后的视频和原始音频合并
-final_video = mp.VideoFileClip(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/output.mp4").set_audio(audio)
+final_video = mp.VideoFileClip(f"{folder_path}output.mp4").set_audio(audio)
 
 # 保存最终的视频文件
-final_video.write_videofile(f"D:/Python/研究所/360_degreePanoramaVideoUpscaling/{fileName}_final_output.mp4")
+final_video.write_videofile(f"{folder_path}{fileName}_final_output.mp4")
 
 # 清理资源
 final_video.close()
