@@ -50,7 +50,7 @@ def adjust_brightness(input_file, output_file, alpha, beta, threshold):
     out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
 
     frame_count = 0  # 初始化帧计数器
-
+    # 循环遍历视频的每一帧
     while frame_count < total_frames:  # 使用帧计数器作为循环终止条件
         ret, frame = video.read()
 
@@ -63,7 +63,6 @@ def adjust_brightness(input_file, output_file, alpha, beta, threshold):
         std = cv2.meanStdDev(frame)[1][0][0]
 
         if ret:
-
              # 判断当前帧的亮度是否过暗或过亮
             if mean / 255 < threshold or mean / 255 + std / 255 < threshold:
             # 进行亮度调整
@@ -130,17 +129,16 @@ def increase_frame_rate(input_file, output_file, target_fps):
 
     out = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'mp4v'), output_fps, (output_width, output_height))
 
-    while True:
+    while video.isOpened():
         ret, frame = video.read()
 
-        if not ret:
-            break
-
-        # 將每個幀重複 n 次，以增加幀數
-        n = int(round(output_fps / original_fps))
-        for _ in range(n):
-            out.write(frame)
-
+        if ret:
+            # 將每個幀重複 n 次，以增加幀數
+            n = int(round(output_fps / original_fps)) 
+            for _ in range(n):
+                out.write(frame)       
+        else:    
+            break  
     video.release()
     out.release()
 
@@ -183,15 +181,16 @@ def process_video_with_audio(input_file, output_file, final_output_file):
 
 def main():
     # 设置输入文件和输出文件路径
-    folder_path = "D:/Python/研究所/source video/"
-    input_file = folder_path + "Low.mp4"
+    folder_path = "C:/Python/source video/"
+    filename = "low"
+    input_file = folder_path + filename + ".mp4" 
     temp_file = folder_path + "temp.mp4"
     output_file = folder_path + "output.mp4"
     resized_file = folder_path + "resized.mp4"
-    final_output_file = folder_path + "final_output.mp4"
+    final_output_file = folder_path + filename + "_final_output.mp4"
 
     # 定义调整参数
-    alpha = 1.5  # 亮度调整系数
+    alpha = 1.5  # 亮度调整系数cd
     beta = 20  # 亮度调整偏移量
     threshold = 0.5  # 阈值，用于判断亮度是否过暗或过亮
     new_width = 5760 #7680 # 新的宽度
@@ -206,15 +205,15 @@ def main():
     #resize_video(input_file, resized_file, new_width, new_height)
     #resize_video(output_file, resized_file, new_width, new_height)
     
-    print("调整亮度") 
-    adjust_brightness(temp_file, output_file, alpha, beta, threshold)
+    #print("调整亮度") 
+    #adjust_brightness(temp_file, output_file, alpha, beta, threshold)
     
 
     # print("减少噪点")
     # reduce_noise(resized_file, output_file, kernel_size)
     
     print("合并视频和音频")  
-    process_video_with_audio(input_file, output_file, final_output_file)
+    process_video_with_audio(input_file, temp_file, final_output_file)
 
 
 

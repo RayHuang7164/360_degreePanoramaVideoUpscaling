@@ -1,6 +1,7 @@
 import cv2
 import moviepy.editor as mp
-import os
+
+
 # 設置輸入文件和輸出文件路徑
 folder_path = "C:/Python/source video/"
 filename = "low"
@@ -19,14 +20,35 @@ new_height = 2880 #4320  # 新的高度
 kernel_size = (5, 5)  # 高斯濾波器的內核大小     
 
 #取得影片
-video = cv2.VideoCapture(input_file)
+video1 = cv2.VideoCapture(input_file)
 
 # 檢查視頻是否成功打開
-if not video.isOpened():
+if not video1.isOpened():
     print('视频无法打开')
     exit()
 
+# 獲取視頻的幀率、寬度和高度
+fps1 = int(video1.get(cv2.CAP_PROP_FPS))
+width1 = int(video1.get(cv2.CAP_PROP_FRAME_WIDTH))
+height1 = int(video1.get(cv2.CAP_PROP_FRAME_HEIGHT))
+total_frames1 = int(video1.get(cv2.CAP_PROP_FRAME_COUNT))
 
+#region Description ==提高幀率又不改變影片撥放==
+newfps = cv2.VideoWriter(temp_file, cv2.VideoWriter_fourcc(*'mp4v'), 120, (width1, height1)) #提高幀率120fps
+while True:
+    ret, frame = video1.read()
+
+    if not ret:
+        break
+    # 將每個幀重複 n 次，以增加幀數
+    n = int(round(120 / fps1))
+    for _ in range(n):
+        newfps.write(frame) 
+     
+#endregion 
+
+#取得影片
+video = cv2.VideoCapture(temp_file)
 
 # 獲取視頻的幀率、寬度和高度
 fps = int(video.get(cv2.CAP_PROP_FPS))
@@ -88,9 +110,9 @@ final_video = mp.VideoFileClip(output_file).set_audio(audio)
 # 保存最終的視頻文件
 final_video.write_videofile(final_output_file)
 # 清理资源
+
 final_video.close()
 video_with_audio.close()
-os.remove(output_file)
 #endregion   
 
 
