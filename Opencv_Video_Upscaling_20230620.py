@@ -104,7 +104,7 @@ out.release()
 
 #region Description ==加載聲音==
 video_with_audio = mp.VideoFileClip(input_file)     # 加載原始視頻文件
-video = cv2.VideoCapture(input_file)                # 取得影片
+#video = cv2.VideoCapture(input_file)                # 取得影片
 audio = video_with_audio.audio                      # 讀取原始視頻中的音頻
 final_video = mp.VideoFileClip(output_file).set_audio(audio)    # 創建一個新的視頻文件，將處理後的視頻和原始音頻合併
 final_video.write_videofile(final_output_file)      # 保存最終的視頻文件
