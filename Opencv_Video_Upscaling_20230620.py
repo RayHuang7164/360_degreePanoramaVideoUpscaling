@@ -1,14 +1,13 @@
 import cv2
 import moviepy.editor as mp
 import numpy as np
+from pydub import AudioSegment
 
 # 設置輸入文件和輸出文件路徑
 folder_path = "D:/Python/source video/"
 filename = "Low"
 input_file = folder_path + filename + ".mp4" 
-temp_file = folder_path + "temp.mp4"
 output_file = folder_path + "output.mp4"
-#resized_file = folder_path + "resized.mp4"
 final_output_file = folder_path + filename + "_final_output.mp4"
 
 # 定義調整參數
@@ -54,25 +53,25 @@ while video.isOpened():
         
         
         #region reduce_noise ==高斯濾波器減少視頻的噪點==
-        frame_gamma = cv2.GaussianBlur(resized_frame, kernel_size, 0)
+        GaussianBlur_frame = cv2.GaussianBlur(resized_frame, kernel_size, 0)
         #endregion 
         
-        # #region  ==Gamma Correction==
-        # # 將影格轉換為浮點數型態
-        # resized_frame = blurred_frame.astype(float)
-        # # 正規化像素值到 0-1 範圍 
-        # # 每個像素值都會除以 255.0，從而將它們正規化為 0 到 1 之間的小數值。
-        # # 這樣做可以將像素值縮放到一個固定的範圍，方便後續的處理和運算
-        # resized_frame /= 255.0
-        # # 伽瑪校正
-        # resized_frame = np.power(resized_frame, 2) #gamma
-        # # 將像素值重新調整為 0-255 範圍
-        # resized_frame *= 255.0
-        # # 四捨五入到整數型態
-        # resized_frame = np.round(resized_frame)
-        # # 轉換為 8 位元無符號整數型態
-        # frame_gamma = resized_frame.astype(np.uint8)
-        # #endregion 
+        #region  ==Gamma Correction==
+        # 將影格轉換為浮點數型態
+        resized_frame = GaussianBlur_frame.astype(float)
+        # 正規化像素值到 0-1 範圍 
+        # 每個像素值都會除以 255.0，從而將它們正規化為 0 到 1 之間的小數值。
+        # 這樣做可以將像素值縮放到一個固定的範圍，方便後續的處理和運算
+        resized_frame /= 255.0
+        # 伽瑪校正
+        resized_frame = np.power(resized_frame, 2) #gamma
+        # 將像素值重新調整為 0-255 範圍
+        resized_frame *= 255.0
+        # 四捨五入到整數型態
+        resized_frame = np.round(resized_frame)
+        # 轉換為 8 位元無符號整數型態
+        frame_gamma = resized_frame.astype(np.uint8)
+        #endregion 
         
         
         #region adjust_brightness ==调整影片的亮度==
@@ -85,15 +84,15 @@ while video.isOpened():
         # 判斷當前幀的亮度是否過暗或過亮
         if mean / 255 < threshold or mean / 255 + std / 255 < threshold:
         # 進行亮度調整
-            frame_adjusted = cv2.convertScaleAbs(frame_gamma, alpha=alpha, beta=beta)
+            adjust_brightness = cv2.convertScaleAbs(frame_gamma, alpha=alpha, beta=beta)
         else:
-            frame_adjusted = frame_gamma
+            adjust_brightness = frame_gamma
         #endregion                  
     else:
         break
     
     # 寫入輸出視頻
-    out.write(frame_adjusted)
+    out.write(adjust_brightness)
 
     # 顯示當前處理進度
     print(f'Processed {video.get(cv2.CAP_PROP_POS_FRAMES)} frames of {total_frames}')
@@ -104,12 +103,19 @@ out.release()
 
 #region Description ==加載聲音==
 video_with_audio = mp.VideoFileClip(input_file)     # 加載原始視頻文件
-#video = cv2.VideoCapture(input_file)                # 取得影片
 audio = video_with_audio.audio                      # 讀取原始視頻中的音頻
-final_video = mp.VideoFileClip(output_file).set_audio(audio)    # 創建一個新的視頻文件，將處理後的視頻和原始音頻合併
+# 將音頻轉換為 AudioSegment 對象
+audio_segment = AudioSegment.from_file(audio.fps, audio.nchannels, audio.sample_width, audio.raw_data, audio.frame_rate)
+# 修改音頻的採樣率為44.1kHz
+audio_segment = audio_segment.set_frame_rate(44100)
+# 將修改後的音頻重新轉換回 MoviePy 的 AudioFileClip 對象
+modified_audio = mp.AudioFileClip(audio_segment)
+# 創建一個新的視頻文件，將處理後的視頻和原始音頻合併
+final_video = mp.VideoFileClip(output_file).set_audio(modified_audio)    
 final_video.write_videofile(final_output_file)      # 保存最終的視頻文件
 final_video.close()                                 # 關閉最簡單的視頻文件
 video_with_audio.close()                            # 清理资源
+
 #endregion   
 
 
