@@ -16,7 +16,7 @@ window.configure(background="#323232")  # 背景名 'skyblue'
 window.attributes('-topmost', True)  # 置頂狀態
 window.attributes('-alpha', 0.95)  # 透明屬性
 # ICON
-window.iconbitmap('sync.ico')
+#window.iconbitmap('sync.ico')
 
 
 
