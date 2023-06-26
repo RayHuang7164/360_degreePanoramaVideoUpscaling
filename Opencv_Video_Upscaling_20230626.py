@@ -14,8 +14,8 @@ final_output_file = folder_path + filename + "_final_output.mp4"
 alpha = 1.5  # 亮度調整係數
 beta = 20  # 亮度調整偏移量
 threshold = 0.5  # 閾值，用於判斷亮度是否過暗或過亮
-new_width = 5760    #12288×6480  #7680
-new_height = 2880                #4320
+new_width = 5760      #7680    #12288×8640
+new_height = 2880       #4320
 kernel_size = (5, 5)  # 高斯濾波器的內核大小
 
 # 加載視頻
@@ -28,13 +28,13 @@ if not video.isOpened():
 
 # 獲取視頻的帧速率
 sourse_fps = int(video.get(cv2.CAP_PROP_FPS))
+print('影片帧速率:' + str(sourse_fps))
 new_fps = 120
  # 提高帧速率
 if (sourse_fps > 120):  
-    sourse_fps = sourse_fps
-    video.set(cv2.CAP_PROP_FPS, new_fps) # 设置新的帧速率
-
-
+    new_fps = sourse_fps
+    
+video.set(cv2.CAP_PROP_FPS, new_fps) # 设置新的帧速率
 
 # 獲取視頻的寬度和高度
 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
