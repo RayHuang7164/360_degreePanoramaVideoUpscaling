@@ -26,10 +26,17 @@ if not video.isOpened():
     print('無法打開視頻')
     exit()
 
-# 提高帧速率
-new_fps = 60  # 设置新的帧速率
-video.set(cv2.CAP_PROP_FPS, new_fps)
-fps = int(video.get(cv2.CAP_PROP_FPS))
+# 獲取視頻的帧速率
+sourse_fps = int(video.get(cv2.CAP_PROP_FPS))
+
+ # 提高帧速率
+if (sourse_fps > 120):
+    new_fps = 120  # 设置新的帧速率
+    video.set(cv2.CAP_PROP_FPS, new_fps)
+    fps = int(video.get(cv2.CAP_PROP_FPS))
+else:
+    fps = sourse_fps
+
 
 # 獲取視頻的寬度和高度
 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
