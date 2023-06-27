@@ -29,4 +29,4 @@ def main( ):
     cv2.imshow( "Gamma = 0.2", img2 )
     cv2.imshow( "Gamma = 0.1", img1 )
     cv2.imshow( "Gamma = 0.5", img3 )
-    cv2.waitKey( 0 )main(
+    cv2.waitKey( 0 ) 
