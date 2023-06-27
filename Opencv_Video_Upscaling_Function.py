@@ -110,7 +110,7 @@ def reduce_noise(input_file, output_file, kernel_size):
     video.release()
     out.release()
 
-#提高幀率又不改變影片撥放
+#提高fps又不改變影片撥放  (frames per second) 「每秒傳輸幀數」
 def increase_frame_rate(input_file, output_file, target_fps):
     video = cv2.VideoCapture(input_file)
 
