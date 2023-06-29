@@ -27,7 +27,7 @@ if not video.isOpened():
     exit()
 
 # 提高帧速率
-new_fps = 60  # 设置新的帧速率
+new_fps = 30  # 设置新的帧速率
 video.set(cv2.CAP_PROP_FPS, new_fps)
 fps = int(video.get(cv2.CAP_PROP_FPS))
 
