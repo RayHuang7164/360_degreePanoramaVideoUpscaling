@@ -4,7 +4,7 @@ import numpy as np
 from pydub import AudioSegment
 
 # 设置输入文件和输出文件路径
-folder_path = "D:/Python/source video/"
+folder_path = "c:/Python/source video/"
 filename = "Low"
 input_file = folder_path + filename + ".mp4"
 output_file = folder_path + "output.mp4"
