@@ -64,12 +64,10 @@ while video.isOpened():
         frame_gamma = np.round(frame_gamma).astype(np.uint8)
 
         # 判斷亮度並進行調整
-       
-
         mean = cv2.mean(frame_gamma)[0] / 255
         std = cv2.meanStdDev(frame_gamma)[1][0][0] / 255
         if mean < threshold or mean + std < threshold:
-            adjusted_frame = cv2.convertScaleAbs(frame_gamma, alpha=alpha, beta=beta)
+                adjusted_frame = cv2.convertScaleAbs(frame_gamma, alpha=alpha, beta=beta)
         else:
             adjusted_frame = frame_gamma
 
@@ -90,21 +88,23 @@ while video.isOpened():
 video.release()
 out.release()
 
-# 載入音頻
-video_with_audio = mp.VideoFileClip(input_file)
-audio = video_with_audio.audio
-audio_segment = audio.to_soundarray(fps=44100)
-modified_audio = AudioSegment(
-    audio_segment.tobytes(),
-    frame_rate=44100,
-    channels=audio_segment.shape[1],
-    sample_width=audio_segment.dtype.itemsize,
-    duration=len(audio_segment) / audio_segment.frame_rate
-)
 
-# 合併提升帧后的影片和音頻
-final_video = mp.VideoFileClip(output_file).set_audio(modified_audio)
-final_video.write_videofile(final_output_file, fps=fps)
+#===================加載聲音=======================
+# 加载原始视频文件    44100,
+video_with_audio = mp.VideoFileClip(input_file)
+
+# 读取原始视频中的音频
+audio = video_with_audio.audio
+
+# 创建一个新的视频文件，将处理后的视频和原始音频合并
+final_video = mp.VideoFileClip(output_file).set_audio(audio)
+
+# 保存最终的视频文件
+final_video.write_videofile(final_output_file)
+
+# 清理资源
 final_video.close()
 video_with_audio.close()
+
+
 
