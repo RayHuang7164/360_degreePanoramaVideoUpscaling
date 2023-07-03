@@ -16,7 +16,8 @@ threshold = 0.5  # 閾值，用於判斷亮度是否過暗或過亮
 new_width =  7680 #5760  #7680 
 new_height = 4320 #2880 #4320
 frame_increase = 1  # 帧数提高倍数
-gamma = 0.5  # Gamma 調整參數
+#gamma = 0.5  # Gamma 調整參數
+gamma_values = [0.5, 0.8, 1.0, 1.2, 1.5]  # 每帧的 gamma 值
 
 # 載入影片
 video = cv2.VideoCapture(input_file)
@@ -54,8 +55,12 @@ while True:
 
     if ret:
         
+          # 获取当前帧对应的 gamma 值
+        current_gamma = gamma_values[frame_count % len(gamma_values)]
+        
         # Gamma 調整
-        gamma_frame = np.power(frame / 255.0, gamma)
+        gamma_frame = np.power(frame / 255.0, current_gamma)
+        #gamma_frame = np.power(frame / 255.0, gamma)
         adjusted_frame = np.round(gamma_frame * 255.0).astype(np.uint8)
         
         # 圖像縮放
