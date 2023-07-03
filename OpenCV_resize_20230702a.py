@@ -4,7 +4,7 @@ import numpy as np
 
 # 設定輸入和輸出檔案路徑
 folder_path = "c:/Python/source video/"
-filename = "HarryPotter_Ray"
+filename = "low"
 input_file = folder_path + filename + ".mp4"
 output_file = folder_path + "output.mp4"
 final_output_file = folder_path + filename + "_final_output.mp4"
@@ -13,11 +13,9 @@ final_output_file = folder_path + filename + "_final_output.mp4"
 alpha = 1.5  # 亮度調整係數
 beta = 20  # 亮度調整偏移量
 threshold = 0.5  # 閾值，用於判斷亮度是否過暗或過亮
-new_width =  7680 #5760  #7680 
-new_height = 4320 #2880 #4320
+new_width = 5760 #7680  # 新的寬度
+new_height = 2880 #4320  # 新的高度
 frame_increase = 1  # 帧数提高倍数
-#gamma = 0.5  # Gamma 調整參數
-gamma_values = [0.5, 0.8, 1.0, 1.2, 1.5]  # 每帧的 gamma 值
 
 # 載入影片
 video = cv2.VideoCapture(input_file)
@@ -50,58 +48,44 @@ out = cv2.VideoWriter(output_file, fourcc, fps, (new_width, new_height))
 # 循環遍歷影片的每一帧
 frame_count = 0
 frame_multiplier = 0
+adjusted_frames = []  # 保存每一帧的 adjusted_frame
 while True:
     ret, frame = video.read()
 
     if ret:
-        
-          # 获取当前帧对应的 gamma 值
-        current_gamma = gamma_values[frame_count % len(gamma_values)]
-        
+        # 计算当前帧的亮度
+        brightness = np.mean(frame) / 255.0
+
+        # 根据亮度动态调整 gamma 值
+        gamma = 2.2 - brightness * 1.2
+
         # Gamma 調整
-        gamma_frame = np.power(frame / 255.0, current_gamma)
-        #gamma_frame = np.power(frame / 255.0, gamma)
+        gamma_frame = np.power(frame / 255.0, gamma)
         adjusted_frame = np.round(gamma_frame * 255.0).astype(np.uint8)
-        
-        # 圖像縮放
-        resized_frame = cv2.resize(adjusted_frame, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
 
-        # 減少噪點
-        blurred_frame = cv2.GaussianBlur(resized_frame, (5, 5), 0)
-   
-        # 寫入調整帧後的影片
-        out.write(blurred_frame)
-        
-        # 顯示處理進度
-        print(f'已處理 {frame_count + 1} 帧 / 總帧数 {new_total_frames}')
-       
+        # 调整亮度和对比度
+        adjusted_frame = cv2.convertScaleAbs(adjusted_frame, alpha=alpha, beta=beta)
 
-        # 檢查是否已處理完畢所有原始帧
-        if frame_multiplier == frame_interval - 1:
-            frame_multiplier = 0
-            frame_count += 1
-        else:
-            frame_multiplier += 1
+        # 重复当前帧
+        for _ in range(frame_interval):
+            adjusted_frames.append(adjusted_frame)
+
+        frame_count += 1
+        print(f'已處理 {frame_count} 帧 / 總帧数 {total_frames}')
     else:
         break
 
-# 釋放資源
 video.release()
-out.release()
 
+# 根据调整后的帧数创建新的影片剪辑
+clip = mp.VideoFileClip(output_file)
+clip = clip.set_duration(new_total_frames / fps)
 
-# 加載聲音
-video_with_audio = mp.VideoFileClip(input_file)
+# 将每一帧添加到新的影片剪辑中
+for frame in adjusted_frames:
+    clip = clip.set_frame(frame)
 
-# 读取原始视频中的音频
-audio = video_with_audio.audio
+# 保存最终输出的影片
+clip.write_videofile(final_output_file, codec='libx264')
 
-# 创建一个新的视频文件，将处理后的视频和原始音频合并
-final_video = mp.VideoFileClip(output_file).set_audio(audio)
-
-# 保存最终的视频文件
-final_video.write_videofile(final_output_file, codec='libx264')
-
-# 清理资源
-final_video.close()
-video_with_audio.close()
+print('處理完成')
