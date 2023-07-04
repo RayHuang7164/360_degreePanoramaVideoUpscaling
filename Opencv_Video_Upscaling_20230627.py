@@ -35,7 +35,7 @@ fps = int(video.get(cv2.CAP_PROP_FPS))
 width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-
+ 
 # 創建一個VideoWriter對象，用於保存處理後的視頻
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 轉換為MP4格式
 out = cv2.VideoWriter(output_file, fourcc, new_fps, (new_width, new_height))
