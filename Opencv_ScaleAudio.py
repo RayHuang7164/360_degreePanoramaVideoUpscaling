@@ -17,7 +17,7 @@ width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # 设置放大比例
-scale = 2  # 放大两倍
+scale = 1  # 放大两倍
 
 # 计算放大后的宽度和高度
 new_width = int(width * scale)
