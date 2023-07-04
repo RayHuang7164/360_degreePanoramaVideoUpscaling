@@ -12,7 +12,7 @@ final_output_file = folder_path + filename + "_final_output.mp4"
 # 定義調整參數
 new_width =  5760  #7680 
 new_height = 2880 #4320
-frame_increase = 1  # 帧数提高倍数
+frame_increase = 2  # 帧数提高倍数
 gamma = 0.5  # Gamma 調整參數
 
 # 載入影片
@@ -50,7 +50,6 @@ while True:
     ret, frame = video.read()
 
     if ret:
-        
         # Gamma 調整
         gamma_frame = np.power(frame / 255.0, gamma)
         adjusted_frame = np.round(gamma_frame * 255.0).astype(np.uint8)
@@ -67,15 +66,18 @@ while True:
         # 顯示處理進度
         print(f'已處理 {frame_count + 1} 帧 / 總帧数 {new_total_frames}')
        
-
         # 檢查是否已處理完畢所有原始帧
         if frame_multiplier == frame_interval - 1:
             frame_multiplier = 0
             frame_count += 1
+            
+            if frame_count >= total_frames:
+                break
         else:
             frame_multiplier += 1
     else:
         break
+    
 
 # 釋放資源
 video.release()
