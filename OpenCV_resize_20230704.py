@@ -10,8 +10,8 @@ output_file = folder_path + "output.mp4"
 final_output_file = folder_path + filename + "_final_output.mp4"
 
 # 定義調整參數
-new_width =  5760  #7680 
-new_height = 2880 #4320
+new_width = 7680 #5760  #7680 
+new_height = 4320 #2880 #4320
 frame_increase = 2  # 帧数提高倍数
 gamma = 0.5  # Gamma 調整參數
 
@@ -50,10 +50,23 @@ while True:
     ret, frame = video.read()
 
     if ret:
-        # Gamma 調整
-        gamma_frame = np.power(frame / 255.0, gamma)
-        adjusted_frame = np.round(gamma_frame * 255.0).astype(np.uint8)
+          
+        # 將影格轉換為灰度圖
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 計算影格的平均亮度
+        mean_brightness = np.mean(gray_frame)
+        #print(f'mean_brightness: {mean_brightness}')
         
+        # 判斷是否需要調整Gamma值
+        if mean_brightness < 95:
+            #如果亮度過暗，進行Gamma校正
+            gamma_frame = np.power(frame / 255.0, gamma)
+            adjusted_frame = np.round(gamma_frame * 255.0).astype(np.uint8)
+        else:
+            # 否則保持原始影格
+            adjusted_frame = frame
+           
         # 減少噪點
         blurred_frame = cv2.GaussianBlur(adjusted_frame, (5, 5), 0)
         
