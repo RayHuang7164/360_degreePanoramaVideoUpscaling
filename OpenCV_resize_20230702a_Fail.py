@@ -3,7 +3,7 @@ import moviepy.editor as mp
 import numpy as np
 
 # 設定輸入和輸出檔案路徑
-folder_path = "c:/Python/source video/"
+folder_path = "d:/Python/source video/"
 filename = "low"
 input_file = folder_path + filename + ".mp4"
 output_file = folder_path + "output.mp4"
@@ -13,8 +13,8 @@ final_output_file = folder_path + filename + "_final_output.mp4"
 alpha = 1.5  # 亮度調整係數
 beta = 20  # 亮度調整偏移量
 threshold = 0.5  # 閾值，用於判斷亮度是否過暗或過亮
-new_width = 5760 #7680  # 新的寬度
-new_height = 2880 #4320  # 新的高度
+new_width = 5760  # 新的寬度
+new_height = 2880  # 新的高度
 frame_increase = 1  # 帧数提高倍数
 
 # 載入影片
@@ -47,7 +47,6 @@ out = cv2.VideoWriter(output_file, fourcc, fps, (new_width, new_height))
 
 # 循環遍歷影片的每一帧
 frame_count = 0
-frame_multiplier = 0
 adjusted_frames = []  # 保存每一帧的 adjusted_frame
 while True:
     ret, frame = video.read()
@@ -75,17 +74,35 @@ while True:
     else:
         break
 
+# 釋放資源
 video.release()
+out.release()
 
-# 根据调整后的帧数创建新的影片剪辑
-clip = mp.VideoFileClip(output_file)
-clip = clip.set_duration(new_total_frames / fps)
-
-# 将每一帧添加到新的影片剪辑中
+# 將調整後的影像寫入新的影片檔案
 for frame in adjusted_frames:
-    clip = clip.set_frame(frame)
+    out.write(frame)
 
-# 保存最终输出的影片
-clip.write_videofile(final_output_file, codec='libx264')
+# 釋放資源
+out.release()
 
-print('處理完成')
+# 加載聲音
+video_with_audio = mp.VideoFileClip(input_file)
+
+# 读取原始视频中的音频
+audio = video_with_audio.audio
+
+# 載入影片檔案
+video_with_audio = mp.VideoFileClip(output_file)
+
+# 列印影片元資料
+print(video_with_audio.reader.infos)
+
+# 创建一个新的视频文件，将处理后的视频和原始音频合并
+final_video = mp.VideoFileClip(output_file).set_audio(audio)
+
+# 保存最终的视频文件
+final_video.write_videofile(final_output_file, codec='libx264')
+
+# 清理资源
+final_video.close()
+video_with_audio.close()
